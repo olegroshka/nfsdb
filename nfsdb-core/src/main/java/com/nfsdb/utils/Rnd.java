@@ -91,4 +91,18 @@ public class Rnd {
         }
         return new String(chars);
     }
+
+    public int nextPositiveInt(int bound) {
+        int r = nextPositiveInt();
+        int m = bound - 1;
+        if ((bound & m) == 0)
+            r = (int)((bound * (long)r) >> 31);
+        else {
+            for (int u = r;
+                 u - (r = u % bound) + m < 0;
+                 u = nextPositiveInt())
+                ;
+        }
+        return r;
+    }
 }
