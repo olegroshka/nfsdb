@@ -73,10 +73,28 @@ public class NWayMapBasicBenchmarkTest {
 
     private static List<String> results = new ArrayList<>();
 
-    private void runScenario(NWayHashMap<CharSequence,CharSequence> map) {
+    private void runScenario(NWayHashMap<CharSequence, CharSequence> map) {
+        warm(map);
+
+        for (int i = 0; i < iterations; i++) {
+            if( rnd.nextBoolean() ) {
+                CharSequence key = keys[i];
+                map.put(key, key);
+            }
+        }
         long start = System.nanoTime();
         runTest(map);
         results.add(map.getClass().getSimpleName() + ", " + ways + ", " + map.size() + ", " + iterations + ", " + (System.nanoTime() - start));
+    }
+
+    private void warm(NWayHashMap<CharSequence, CharSequence> map) {
+        int count = Math.min(15000, iterations);
+        for (int i = 0; i < count; i++) {
+            CharSequence key = keys[i];
+            map.get(key);
+            map.put(key, key);
+        }
+        map.clear();
     }
 
     private void runTest(NWayHashMap<CharSequence, CharSequence> map) {
