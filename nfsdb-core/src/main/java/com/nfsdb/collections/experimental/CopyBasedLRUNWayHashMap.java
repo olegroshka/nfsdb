@@ -34,8 +34,9 @@ public class CopyBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
     }
 
     public V get(K key) {
-        int firstCellIndex = (key.hashCode() & mask) * ways;
-        for (int index = firstCellIndex; index < firstCellIndex + ways; index++) {
+        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int lastCellIndex = firstCellIndex + ways;
+        for (int index = firstCellIndex; index < lastCellIndex; index++) {
             K k = Unsafe.arrayGet(keys, index);
             if (k == null) {
                 return null;
@@ -50,21 +51,14 @@ public class CopyBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
 
     public K put(K key, V value) {
         K oldKey = null;
-        int firstCellIndex = (key.hashCode() & mask) * ways;
-        for (int index = firstCellIndex; index < firstCellIndex + ways; index++) {
+        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int lastCellIndex = firstCellIndex + ways;
+        for (int index = firstCellIndex; index < lastCellIndex; index++) {
             oldKey = Unsafe.arrayGet(keys, index);
             if (oldKey == null) {
                 Unsafe.arrayPut(keys, index, key);
                 Unsafe.arrayPut(values, index, value);
                 return null;
-            }
-
-            if (oldKey == key || key.equals(oldKey)) {
-                System.arraycopy(keys, firstCellIndex, keys, firstCellIndex + 1, index - firstCellIndex);
-                System.arraycopy(values, firstCellIndex, values, firstCellIndex + 1, index - firstCellIndex);
-                Unsafe.arrayPut(keys, firstCellIndex, key);
-                Unsafe.arrayPut(values, firstCellIndex, value);
-                return oldKey;
             }
         }
         //no slots available, shift down and insert in the first cell

@@ -38,13 +38,10 @@ public class TimestampBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
     }
 
     public V get(K key) {
-        int firstCellIndex = (key.hashCode() & mask) * ways;
-        for (int index = firstCellIndex; index < firstCellIndex + ways; index++) {
+        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int lastCellIndex = firstCellIndex + ways;
+        for (int index = firstCellIndex; index < lastCellIndex; index++) {
             K k = Unsafe.arrayGet(keys, index);
-            if (k == null) {
-                return null;
-            }
-
             if (k == key || key.equals(k)) {
                 Unsafe.arrayPut(timestamps, index, System.nanoTime());
                 return Unsafe.arrayGet(values, index);
@@ -55,10 +52,11 @@ public class TimestampBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
 
     public K put(K key, V value) {
         K oldKey;
-        int firstCellIndex = (key.hashCode() & mask) * ways;
+        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int lastCellIndex = firstCellIndex + ways;
         long lruTimestamp = Long.MAX_VALUE;
         int lruIndex = firstCellIndex;
-        for (int index = firstCellIndex; index < firstCellIndex + ways; index++) {
+        for (int index = firstCellIndex; index < lastCellIndex; index++) {
             oldKey = Unsafe.arrayGet(keys, index);
             if (oldKey == null) {
                 Unsafe.arrayPut(keys, index, key);
@@ -66,23 +64,17 @@ public class TimestampBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
                 Unsafe.arrayPut(timestamps, index, System.nanoTime());
                 return null;
             }
-
-            if (oldKey == key || key.equals(oldKey)) {
-                Unsafe.arrayPut(keys, index, key);
-                Unsafe.arrayPut(values, index, value);
-                Unsafe.arrayPut(timestamps, index, System.nanoTime());
-                return oldKey;
-            }
             long timestamp = Unsafe.arrayGet(timestamps, index);
             if( timestamp < lruTimestamp ) {
                 lruTimestamp = timestamp;
                 lruIndex = index;
             }
         }
-        //no slots available, evicting random
+        //no slots available, evicting lru element
         oldKey = Unsafe.arrayGet(keys, lruIndex);
         Unsafe.arrayPut(keys, lruIndex, key);
         Unsafe.arrayPut(values, lruIndex, value);
+        Unsafe.arrayPut(timestamps, lruIndex, System.nanoTime());
 
         return oldKey;
     }
