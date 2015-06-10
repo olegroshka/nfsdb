@@ -38,7 +38,7 @@ public class RndNWayHashMap<K, V> extends NWayHashMapBase<K,V> {
 
     @Override
     public V get(K key) {
-        int firstCellIndex = (key.hashCode() & mask) << waysShift;
+        int firstCellIndex = (key.hashCode() & mask) << bits;
         int lastCellIndex = firstCellIndex + ways;
         for (int index = firstCellIndex; index < lastCellIndex; index++) {
             K k = Unsafe.arrayGet(keys, index);
@@ -51,24 +51,10 @@ public class RndNWayHashMap<K, V> extends NWayHashMapBase<K,V> {
 
     @Override
     public K put(K key, V value) {
-        K oldKey;
-        int firstCellIndex = (key.hashCode() & mask) << waysShift;
-        int lastCellIndex = firstCellIndex + ways;
-        for (int index = firstCellIndex; index < lastCellIndex; index++) {
-            oldKey = Unsafe.arrayGet(keys, index);
-            if (oldKey == null) {
-                Unsafe.arrayPut(keys, index, key);
-                Unsafe.arrayPut(values, index, value);
-                return null;
-            }
-        }
-
-        //no slots available, evicting random
-        int rndIndex = firstCellIndex + (rnd.nextInt() & waysMask);// ways is always a power of 2
-        oldKey = Unsafe.arrayGet(keys, rndIndex);
+        int rndIndex = ((key.hashCode() & mask) << bits) + (rnd.nextInt() & wmask); // ways is always a power of 2
+        K oldKey = Unsafe.arrayGet(keys, rndIndex);
         Unsafe.arrayPut(keys, rndIndex, key);
         Unsafe.arrayPut(values, rndIndex, value);
-
         return oldKey;
     }
 

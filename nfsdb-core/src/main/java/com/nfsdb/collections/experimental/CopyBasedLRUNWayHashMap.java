@@ -34,7 +34,7 @@ public class CopyBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
     }
 
     public V get(K key) {
-        int firstCellIndex = (key.hashCode() & mask) << waysShift;
+        int firstCellIndex = (key.hashCode() & mask) << bits;
         int lastCellIndex = firstCellIndex + ways;
         for (int index = firstCellIndex; index < lastCellIndex; index++) {
             K k = Unsafe.arrayGet(keys, index);
@@ -51,7 +51,7 @@ public class CopyBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
 
     public K put(K key, V value) {
         K oldKey = null;
-        int firstCellIndex = (key.hashCode() & mask) << waysShift;
+        int firstCellIndex = (key.hashCode() & mask) << bits;
         int lastCellIndex = firstCellIndex + ways;
         for (int index = firstCellIndex; index < lastCellIndex; index++) {
             oldKey = Unsafe.arrayGet(keys, index);
@@ -63,8 +63,8 @@ public class CopyBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
         }
         //no slots available, shift down and insert in the first cell
         int toIndex = firstCellIndex + 1;
-        System.arraycopy(keys, firstCellIndex, keys, toIndex, waysMask);
-        System.arraycopy(values, firstCellIndex, values, toIndex, waysMask);
+        System.arraycopy(keys, firstCellIndex, keys, toIndex, wmask);
+        System.arraycopy(values, firstCellIndex, values, toIndex, wmask);
         Unsafe.arrayPut(keys, firstCellIndex, key);
         Unsafe.arrayPut(values, firstCellIndex, value);
 
