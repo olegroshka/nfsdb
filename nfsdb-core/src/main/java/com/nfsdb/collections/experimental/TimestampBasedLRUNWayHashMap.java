@@ -38,7 +38,7 @@ public class TimestampBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
     }
 
     public V get(K key) {
-        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int firstCellIndex = (key.hashCode() & mask) << waysShift;
         int lastCellIndex = firstCellIndex + ways;
         for (int index = firstCellIndex; index < lastCellIndex; index++) {
             K k = Unsafe.arrayGet(keys, index);
@@ -52,7 +52,7 @@ public class TimestampBasedLRUNWayHashMap<K, V> extends NWayHashMapBase<K, V> {
 
     public K put(K key, V value) {
         K oldKey;
-        int firstCellIndex = (key.hashCode() & mask) << (31 - Integer.numberOfLeadingZeros(ways));
+        int firstCellIndex = (key.hashCode() & mask) << waysShift;
         int lastCellIndex = firstCellIndex + ways;
         long lruTimestamp = Long.MAX_VALUE;
         int lruIndex = firstCellIndex;

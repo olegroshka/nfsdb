@@ -20,6 +20,8 @@ public abstract class NWayHashMapBase<K, V> implements NWayHashMap<K, V> {
     protected int capacity;
     protected int mask;
     protected int ways;
+    protected int waysMask;
+    protected int waysShift;
 
     public NWayHashMapBase(int initialWays, int initialCapacity) {
         this.ways = Numbers.ceilPow2(Math.max(MIN_WAYS, initialWays - 1));
@@ -30,6 +32,8 @@ public abstract class NWayHashMapBase<K, V> implements NWayHashMap<K, V> {
         this.keys = (K[]) new Object[cells];
         this.values = (V[]) new Object[cells];
         this.mask = capacity - 1;
+        this.waysMask = ways - 1;
+        this.waysShift = 31 - Integer.numberOfLeadingZeros(ways);
         clear();
     }
 

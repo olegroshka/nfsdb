@@ -2,7 +2,7 @@ package com.nfsdb.collections.experimental;
 
 import java.util.Iterator;
 
-public interface NWayHashMap<K, V> extends Iterable<RndNWayHashMap.Entry<K, V>> {
+public interface NWayHashMap<K, V> extends Iterable<NWayHashMap.Entry<K, V>> {
 
     void clear();
 
