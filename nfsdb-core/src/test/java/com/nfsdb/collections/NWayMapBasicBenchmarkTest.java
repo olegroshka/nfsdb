@@ -32,8 +32,8 @@ public class NWayMapBasicBenchmarkTest {
         this.ways = ways;
         this.size = size;
 
-        this.keys = new CharSequence[iterations];
-        for (int i = 0; i < iterations; i++) {
+        this.keys = new CharSequence[size];
+        for (int i = 0; i < size; i++) {
             int keySize = rnd.nextInt() & 77;
             char[] keyChars = new char[keySize];
             int m = SYMBOLS.length() - 1;

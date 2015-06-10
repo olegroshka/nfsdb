@@ -24,7 +24,7 @@ public abstract class NWayHashMapBase<K, V> implements NWayHashMap<K, V> {
     protected int bits;
 
     public NWayHashMapBase(int initialWays, int initialCapacity) {
-        this.ways = Numbers.ceilPow2(Math.max(MIN_WAYS, initialWays - 1));
+        this.ways = Numbers.ceilPow2(Math.max(MIN_WAYS-1, initialWays - 1));
         int capacity = Math.max(initialCapacity, initialCapacity);
         capacity = capacity < MIN_INITIAL_CAPACITY ? MIN_INITIAL_CAPACITY : Numbers.ceilPow2(capacity);
         this.capacity = capacity;
