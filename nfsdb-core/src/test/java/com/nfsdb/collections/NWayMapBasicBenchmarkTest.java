@@ -25,7 +25,7 @@ public class NWayMapBasicBenchmarkTest {
     private int ways;
     private int size;
     private CharSequence[] keys;
-    private Rnd rnd = new Rnd(System.currentTimeMillis(), System.nanoTime());
+    private Rnd rnd = new Rnd();//System.currentTimeMillis(), System.nanoTime());
 
     public NWayMapBasicBenchmarkTest(int iterations, int ways, int size) {
         this.iterations = iterations;
@@ -74,37 +74,20 @@ public class NWayMapBasicBenchmarkTest {
     private static List<String> results = new ArrayList<>();
 
     private void runScenario(NWayHashMap<CharSequence, CharSequence> map) {
-        warm(map);
-
-        for (int i = 0; i < iterations; i++) {
-            if( rnd.nextBoolean() ) {
-                CharSequence key = keys[i];
-                map.put(key, key);
-            }
-        }
-        long start = System.nanoTime();
-        runTest(map);
-        results.add(map.getClass().getSimpleName() + ", " + ways + ", " + map.size() + ", " + iterations + ", " + (System.nanoTime() - start));
-    }
-
-    private void warm(NWayHashMap<CharSequence, CharSequence> map) {
-        int count = Math.min(15000, iterations);
-        for (int i = 0; i < count; i++) {
-            CharSequence key = keys[i];
-            map.get(key);
-            map.put(key, key);
-        }
-        map.clear();
-    }
-
-    private void runTest(NWayHashMap<CharSequence, CharSequence> map) {
-        for (int i = 0; i < iterations; i++) {
-            CharSequence key = keys[i];
+        int m = size - 1;
+        long start = 0;
+        for (int i = -iterations; i < iterations; i++) {
+            CharSequence key = keys[i & m];
             if( map.get(key) == null ) {
                 map.put(key, key);
             }
+            if(i == 0) {
+                start = System.nanoTime();
+            }
         }
+        results.add(map.getClass().getSimpleName() + ", " + ways + ", " + map.size() + ", " + iterations + ", " + (System.nanoTime() - start));
     }
+
 
     @Test
     public void testTimestampBasedLRUImplementation() {
