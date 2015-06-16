@@ -53,7 +53,7 @@ public class AssociativeCache<K, V> {
         this.capacity = Math.max(AssociativeCache.MIN_INITIAL_CAPACITY, Numbers.ceilPow2(initialCapacity - 1));
         int cells = capacity * this.ways;
         if( cells < 0) {
-            throw new IllegalArgumentException("Overflow, reduce size or number ways.");
+            throw new IllegalArgumentException("Overflow, reduce size or number of ways.");
         }
         this.keys = (K[]) new Object[cells];
         this.values = (V[]) new Object[cells];
