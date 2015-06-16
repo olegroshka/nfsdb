@@ -1,9 +1,6 @@
 package com.nfsdb.collections;
 
-import com.nfsdb.collections.experimental.CopyBasedLRUNWayHashMap;
-import com.nfsdb.collections.experimental.NWayHashMap;
-import com.nfsdb.collections.experimental.RndNWayHashMap;
-import com.nfsdb.collections.experimental.TimestampBasedLRUNWayHashMap;
+import com.nfsdb.collections.experimental.AssociativeCache;
 import com.nfsdb.utils.Rnd;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.AfterClass;
@@ -18,16 +15,16 @@ import java.util.List;
 
 @Ignore
 @RunWith(Parameterized.class)
-public class NWayMapBasicBenchmarkTest {
+public class AssociativeCachePerformanceTest {
 
     private static String SYMBOLS = "1234567890qwertyuioasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
     private int iterations;
     private int ways;
     private int size;
     private CharSequence[] keys;
-    private Rnd rnd = new Rnd();//System.currentTimeMillis(), System.nanoTime());
+    private Rnd rnd = new Rnd();
 
-    public NWayMapBasicBenchmarkTest(int iterations, int ways, int size) {
+    public AssociativeCachePerformanceTest(int iterations, int ways, int size) {
         this.iterations = iterations;
         this.ways = ways;
         this.size = size;
@@ -50,30 +47,30 @@ public class NWayMapBasicBenchmarkTest {
                 new Object[]{15000,   4, 5000},
                 new Object[]{100000,  4, 100000},
                 new Object[]{1000000, 4, 1000000},
-//                new Object[]{10000000,4, 10000000},
-//                new Object[]{10000000,4, 5000000},
-//                new Object[]{10000,   8, 1000},
-//                new Object[]{100000,  8, 10000},
-//                new Object[]{1000000, 8, 100000},
-//                new Object[]{10000000,8, 100000},
-//                new Object[]{10000000,8, 5000000}
+                new Object[]{10000000,4, 10000000},
+                new Object[]{15000,   8, 5000},
+                new Object[]{100000,  8, 100000},
+                new Object[]{1000000, 8, 1000000},
+                new Object[]{10000000,8, 10000000},
                 new Object[]{15000,   16, 5000},
                 new Object[]{100000,  16, 100000},
                 new Object[]{1000000, 16, 1000000},
-//                new Object[]{10000000,16, 100000},
-//                new Object[]{10000000,16, 5000000},
+                new Object[]{10000000,16, 10000000},
+                new Object[]{15000,   32, 5000},
+                new Object[]{100000,  32, 100000},
+                new Object[]{1000000, 32, 1000000},
+                new Object[]{10000000,32, 10000000},
                 new Object[]{15000,   64, 5000},
                 new Object[]{100000,  64, 100000},
-                new Object[]{1000000, 64, 1000000}
-//                new Object[]{10000000,64, 100000},
-//                new Object[]{10000000,64, 5000000}
+                new Object[]{1000000, 64, 1000000},
+                new Object[]{10000000,64, 10000000}
         );
 
     }
 
     private static List<String> results = new ArrayList<>();
 
-    private void runScenario(NWayHashMap<CharSequence, CharSequence> map) {
+    private void runScenario(AssociativeCache<CharSequence, CharSequence> map) {
         int m = size - 1;
         long start = 0;
         for (int i = -iterations; i < iterations; i++) {
@@ -88,20 +85,9 @@ public class NWayMapBasicBenchmarkTest {
         results.add(map.getClass().getSimpleName() + ", " + ways + ", " + map.size() + ", " + iterations + ", " + (System.nanoTime() - start));
     }
 
-
-    @Test
-    public void testTimestampBasedLRUImplementation() {
-        runScenario(new TimestampBasedLRUNWayHashMap<>(ways, size));
-    }
-
     @Test
     public void testCopyBasedLRUImplementation() {
-        runScenario(new CopyBasedLRUNWayHashMap<>(ways, size));
-    }
-
-    @Test
-    public void testRandomBasedImplementation() {
-        runScenario(new RndNWayHashMap<>(ways, size));
+        runScenario(new AssociativeCache<>(ways, size));
     }
 
     @AfterClass

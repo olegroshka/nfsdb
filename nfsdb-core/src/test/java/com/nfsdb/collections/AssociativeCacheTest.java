@@ -1,24 +1,18 @@
 package com.nfsdb.collections;
 
-import com.nfsdb.collections.experimental.CopyBasedLRUNWayHashMap;
-import com.nfsdb.collections.experimental.NWayHashMap;
-import com.nfsdb.collections.experimental.RndNWayHashMap;
-import com.nfsdb.collections.experimental.TimestampBasedLRUNWayHashMap;
-import com.nfsdb.utils.Rnd;
-import junit.framework.Assert;
+import com.nfsdb.collections.experimental.AssociativeCache;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.HashSet;
 
 import static junit.framework.TestCase.assertEquals;
 
 
-public class NWayHashMapTest {
+public class AssociativeCacheTest {
 
     private static int count = 1000000;
 
-    private void test(NWayHashMap<String, Long> map) {
+    private void test(AssociativeCache<String, Long> map) {
         map.put("k1", 1L);
         assertEquals(new Long(1L), map.get("k1"));
 
@@ -43,19 +37,8 @@ public class NWayHashMapTest {
 
     @Test
     public void testBasicsCopyBasedLRU() {
-        test(new CopyBasedLRUNWayHashMap(count));
+        test(new AssociativeCache(count));
     }
-
-    @Test
-    public void testBasicsTimestampBasedLRU() {
-        test(new TimestampBasedLRUNWayHashMap(count));
-    }
-
-    @Test
-    public void testBasicsRnd() {
-        test(new RndNWayHashMap(count));
-    }
-
 
     private static class Key {
         int hash;
@@ -79,7 +62,7 @@ public class NWayHashMapTest {
 
     @Test
     public void tesLRUEvictionOnPut() {
-        CopyBasedLRUNWayHashMap<Key, String> map = new CopyBasedLRUNWayHashMap(4, 8);
+        AssociativeCache<Key, String> map = new AssociativeCache(4, 16);
         Key key1 = new Key(1, "key1");
         assertEquals(null, map.put(key1, "v1"));
         Key key2 = new Key(1, "key2");
