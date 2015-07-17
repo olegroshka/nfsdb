@@ -1,6 +1,5 @@
 package com.nfsdb.collections;
 
-import com.nfsdb.collections.experimental.AssociativeCache;
 import com.nfsdb.utils.Rnd;
 import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.junit.AfterClass;
@@ -70,19 +69,19 @@ public class AssociativeCachePerformanceTest {
 
     private static List<String> results = new ArrayList<>();
 
-    private void runScenario(AssociativeCache<CharSequence, CharSequence> map) {
+    private void runScenario(AssociativeCache<CharSequence, CharSequence> cache) {
         int m = size - 1;
         long start = 0;
         for (int i = -iterations; i < iterations; i++) {
             CharSequence key = keys[i & m];
-            if( map.get(key) == null ) {
-                map.put(key, key);
+            if( cache.get(key) == null ) {
+                cache.put(key, key);
             }
             if(i == 0) {
                 start = System.nanoTime();
             }
         }
-        results.add(map.getClass().getSimpleName() + ", " + ways + ", " + map.size() + ", " + iterations + ", " + (System.nanoTime() - start));
+        results.add(cache.getClass().getSimpleName() + ", " + ways + ", " + cache.capacity() + ", " + iterations + ", " + (System.nanoTime() - start));
     }
 
     @Test

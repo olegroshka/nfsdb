@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.nfsdb.collections.experimental;
+package com.nfsdb.collections;
 
-import com.nfsdb.collections.AbstractImmutableIterator;
 import com.nfsdb.utils.Numbers;
 import com.nfsdb.utils.Unsafe;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -52,7 +51,7 @@ public class AssociativeCache<K, V> {
         this.ways = Math.max(AssociativeCache.MIN_WAYS, Numbers.ceilPow2(initialWays - 1));
         this.capacity = Math.max(AssociativeCache.MIN_INITIAL_CAPACITY, Numbers.ceilPow2(initialCapacity - 1));
         int cells = capacity * this.ways;
-        if( cells < 0) {
+        if( cells <= 0) {
             throw new IllegalArgumentException("Overflow, reduce size or number of ways.");
         }
         this.keys = (K[]) new Object[cells];
@@ -127,7 +126,7 @@ public class AssociativeCache<K, V> {
         }
     }
 
-    public int size() {
+    public int capacity() {
         return capacity;
     }
 
